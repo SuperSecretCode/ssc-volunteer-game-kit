@@ -39,7 +39,8 @@ CODE RULES
 - Images: WebP files under /game-assets/ (for example '/game-assets/room-1.webp'). Preload the current level's images.
 - Font: fontFamily "'Rodger', sans-serif" on all child-facing text, including every button.
 - Tap targets at least 44×44 px.
-- Design for DESKTOP AND TABLET first (landscape, roughly 16:9 on desktop and 4:3 on tablet). The game fills whatever box it's given and must keep everything inside it. On a phone it still has to fit and stay tappable; a simpler tall layout is fine there (see useSceneSize in MyGame.tsx).
+- SIZE: the app gives the game a box with an exact shape, as large as fits: 16:9 on desktop, 4:3 on tablet, 9:16 on phone portrait. Fill the whole box, position everything in %, and keep it all inside the box. Design for DESKTOP AND TABLET first; on a phone the game still has to fit and stay tappable, and a simpler tall layout is fine there (see useSceneSize in MyGame.tsx).
+- Measure the box with ResizeObserver contentRect or clientWidth/clientHeight, never getBoundingClientRect (the app may zoom the page).
 
 WHEN YOU GIVE ME CODE
 - Give the complete .tsx file every time (not fragments), plus the complete game.config.ts whenever text, totals or recordings change.
