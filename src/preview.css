@@ -19,3 +19,11 @@ body { font-family: system-ui, sans-serif; background: #d9d9de; color: #222; }
 .preview-log li { padding: 4px 0; border-bottom: 1px solid #e2e2e8; }
 .preview-log li.is-warn { color: #a12400; font-weight: 600; }
 .preview-log time { color: #888; margin-right: 4px; font-variant-numeric: tabular-nums; }
+
+/* Narrow windows: put the log under the game instead of beside it. */
+@media (max-width: 1000px) {
+  .preview-main { flex-direction: column; }
+  .preview-log { width: auto; height: 34%; border-left: 0; border-top: 1px solid #c7c7cf; }
+  .preview-bar { gap: 6px; padding: 6px 8px; }
+  .preview-name { width: 100%; }
+}

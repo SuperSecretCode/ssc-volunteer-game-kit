@@ -24,7 +24,8 @@ export default function App() {
   const [startLang, setStartLang] = useState<Lang>(GAME_CONFIG.pageLanguage);
   const [visit, setVisit] = useState(0);
   const [entries, setEntries] = useState<LogEntry[]>([]);
-  const [showLog, setShowLog] = useState(true);
+  // In a narrow window (like StackBlitz's preview panel) start with the log hidden so the game gets the space.
+  const [showLog, setShowLog] = useState(() => window.innerWidth >= 1100);
   const [scale, setScale] = useState(1);
   const stageRef = useRef<HTMLDivElement>(null);
   const nextId = useRef(0);
