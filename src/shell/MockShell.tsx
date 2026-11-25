@@ -1,6 +1,6 @@
 import { useCallback, useLayoutEffect, useRef, useState } from 'react';
-import type { ComponentType } from 'react';
-import type { GameConfig, Lang, Stage, VolunteerGameProps } from '../contract';
+import type { ComponentType, PointerEvent as ReactPointerEvent } from 'react';
+import type { GameConfig, Lang, Stage, TuningState, VolunteerGameProps } from '../contract';
 import { useShellAudio, type AudioItem } from './useShellAudio';
 import './MockShell.css';
 
@@ -47,6 +47,16 @@ type Props = {
   short?: boolean;
   /** The exact shape of the box the game gets, as in the real app (step 4 of the skill). */
   shape: GameShape;
+  /** Preview-only: present while "Tune layout" is on. The real app never passes it. */
+  tuning?: TuningState;
+  /** Preview-only: selecting and dragging items in the game while tuning. */
+  tune?: {
+    selected: string | null;
+    onSelect: (id: string) => void;
+    onDragStart: (id: string) => void;
+    /** Movement since the drag started, in % of the game box. */
+    onDrag: (id: string, dxPct: number, dyPct: number) => void;
+  };
   log: (message: string, level?: 'info' | 'warn') => void;
 };
 
@@ -55,8 +65,57 @@ const LABELS = {
   fr: { hint: 'indice', restart: 'recommencer', tell: 'Dis-le à Theresa', helper: 'Aide', splash: 'Prépare-toi pour une mission-jeu !', start: 'Commencer', play: 'Écouter les consignes', pause: 'Pause' },
 } as const;
 
-export default function MockShell({ config, Game, startLang, layout, short = false, shape, log }: Props) {
+export default function MockShell({ config, Game, startLang, layout, short = false, shape, tuning, tune, log }: Props) {
   const { areaRef, box } = useGameBox(shape);
+  const gameBoxRef = useRef<HTMLDivElement>(null);
+  const dragRef = useRef<{ id: string; x: number; y: number } | null>(null);
+  const [outline, setOutline] = useState<{ left: number; top: number; width: number; height: number } | null>(null);
+
+  // Draw the selection outline around the selected item (preview only).
+  useLayoutEffect(() => {
+    const host = gameBoxRef.current;
+    const id = tuning ? tune?.selected : null;
+    if (!host || !id) {
+      setOutline(null);
+      return;
+    }
+    const frame = requestAnimationFrame(() => {
+      const el = host.querySelector(`[data-tune="${CSS.escape(id)}"]`);
+      if (!el) return setOutline(null);
+      const hostRect = host.getBoundingClientRect();
+      const zoom = hostRect.width / host.offsetWidth || 1; // undo the preview zoom
+      const r = el.getBoundingClientRect();
+      setOutline({
+        left: (r.left - hostRect.left) / zoom,
+        top: (r.top - hostRect.top) / zoom,
+        width: r.width / zoom,
+        height: r.height / zoom,
+      });
+    });
+    return () => cancelAnimationFrame(frame);
+  });
+
+  const tunePointerDown = (e: ReactPointerEvent<HTMLDivElement>) => {
+    if (!tuning || !tune) return;
+    const target = (e.target as HTMLElement).closest<HTMLElement>('[data-tune]');
+    if (!target || !e.currentTarget.contains(target)) return;
+    e.preventDefault();
+    e.stopPropagation(); // in Tune, taps select and drag instead of playing
+    const id = target.dataset.tune!;
+    tune.onSelect(id);
+    tune.onDragStart(id);
+    dragRef.current = { id, x: e.clientX, y: e.clientY };
+    e.currentTarget.setPointerCapture(e.pointerId);
+  };
+  const tunePointerMove = (e: ReactPointerEvent<HTMLDivElement>) => {
+    const drag = dragRef.current;
+    if (!drag || !tune) return;
+    const rect = e.currentTarget.getBoundingClientRect(); // screen px, same as the pointer
+    tune.onDrag(drag.id, ((e.clientX - drag.x) / rect.width) * 100, ((e.clientY - drag.y) / rect.height) * 100);
+  };
+  const tunePointerUp = () => {
+    dragRef.current = null;
+  };
   const [lang, setLang] = useState<Lang>(startLang);
   const [hintRequest, setHintRequest] = useState(0);
   const [restartRequest, setRestartRequest] = useState(0);
@@ -267,12 +326,30 @@ export default function MockShell({ config, Game, startLang, layout, short = fal
         </aside>
 
         <main className="ssc-play" ref={areaRef}>
-          <div className="ssc-game-box" style={{ width: box.width, height: box.height }} title={`Game box ${shape}: ${box.width} × ${box.height}`}>
+          <div
+            ref={gameBoxRef}
+            className={`ssc-game-box${tuning ? ' tune-active' : ''}`}
+            style={{ width: box.width, height: box.height }}
+            title={`Game box ${shape}: ${box.width} × ${box.height}`}
+            onPointerDownCapture={tunePointerDown}
+            onPointerMove={tunePointerMove}
+            onPointerUp={tunePointerUp}
+            onPointerCancel={tunePointerUp}
+            onClickCapture={(e) => {
+              if (tuning && (e.target as HTMLElement).closest('[data-tune]')) e.stopPropagation();
+            }}
+          >
+          {outline && tune?.selected && (
+            <div className="tune-outline" style={outline}>
+              <span>{tune.selected}</span>
+            </div>
+          )}
           {box.width > 0 && <Game
             lang={lang}
             hintRequest={hintRequest}
             restartRequest={restartRequest}
             introStartCue={introCue}
+            tuning={tuning}
             onProgress={onProgress}
             onStageEnter={onStageEnter}
             onLevelComplete={onLevelComplete}
