@@ -10,16 +10,22 @@ You build **only the play area** (the big rounded box in the middle). The app su
 
 ## Opening the kit
 
-**Option A: in your browser (nothing to install).** Theresa will send you a StackBlitz link. StackBlitz is a free code editor that runs in the browser and shows the live preview beside the code. Edit the files on the left; the preview updates by itself.
+**To try the kit: in your browser.** Theresa's StackBlitz link opens the kit with the sample game, with nothing to install. It's great for exploring, but StackBlitz's free plan only makes public projects and allows only small uploads, so **don't build real games there**.
 
-**Option B: on your computer.** Install [Node.js](https://nodejs.org) (the LTS version), then in this folder run:
+**To build real games: on your computer.** This keeps your artwork private and has no size limits.
+
+1. Download the kit: on https://github.com/SuperSecretCode/ssc-volunteer-game-kit click the green **Code** button, then **Download ZIP**, and unzip it.
+2. Install [Node.js](https://nodejs.org) (the LTS version). You only do this once.
+3. Open a terminal in the kit folder (on Windows: open the folder, click the address bar, type `cmd` and press Enter) and run:
 
 ```
 npm install
 npm run dev
 ```
 
-Open the address it prints (usually http://localhost:5173).
+4. Open the address it prints (usually http://localhost:5173). Leave the terminal open while you work; the preview updates every time you save a file.
+
+Start each new game from a fresh copy of the kit, so games don't mix.
 
 ## The files
 
@@ -85,12 +91,19 @@ The app passes these props to your game (details in `src/contract.ts`):
 
 ## What to deliver
 
-1. Your game's `.tsx` file(s) and any `.css` or data files they import.
-2. Your filled-in `game.config.ts`.
-3. Your assets folder (images, and recordings if they aren't already uploaded), with names exactly as the code uses them, including capitals.
-4. A short note: anything unfinished, anything you weren't sure about.
+Put each finished game in its own folder inside the shared **Super Secret Code Shared Folder → Games** on OneDrive, laid out like this:
 
-**No HTML preview files, no `App.tsx`, no `shell/` folder, no `package.json`.**
+```
+<game-name>/
+├── game/      your .tsx file(s), any .css or data files they import, and game.config.ts
+├── images/    WebP images, named exactly as the code uses them (capitals included)
+├── audio/     recordings, if they aren't already uploaded somewhere Theresa gave you
+└── NOTES.md   anything unfinished, anything you weren't sure about
+```
+
+Then let Theresa know it's there.
+
+**Don't include:** HTML preview files, `App.tsx`, the `shell/` folder, `contract.ts`, `package.json` or `node_modules`.
 
 ## Building the game with ChatGPT
 
