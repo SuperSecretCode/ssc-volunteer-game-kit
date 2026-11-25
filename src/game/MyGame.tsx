@@ -37,9 +37,9 @@ const TEXT = {
 type Point = { id: string; x: number; y: number };
 
 /**
- * Each level has positions for a wide (landscape) layout and a tall (phone
- * portrait) layout. Super Secret Code is designed for phone portrait first,
- * so use the tall space instead of shrinking a landscape scene.
+ * Each level has positions for a wide layout (desktop and tablet, the priority)
+ * and a tall layout (phone portrait). Get the wide layout right first; the
+ * tall one just has to keep everything visible and tappable on a phone.
  * Image paths: put files in public/game-assets/ and reference them as
  * '/game-assets/<file>.webp'. Use WebP for every image.
  */
