@@ -166,7 +166,9 @@
   line-height: 1.4;
 }
 
-.ssc-play { flex: 1; min-width: 0; min-height: 0; }
+.ssc-play { flex: 1; min-width: 0; min-height: 0; display: grid; place-items: center; }
+/* The exact-shaped box your game gets. The faint outline is preview-only. */
+.ssc-game-box { position: relative; outline: 1px dashed rgba(107, 22, 255, 0.25); outline-offset: 2px; }
 
 /* ---- Footer controls ---- */
 .ssc-footer-left { position: absolute; left: 14px; bottom: 12px; display: flex; flex-direction: column; gap: 14px; align-items: flex-start; }
@@ -204,7 +206,8 @@
 .ssc-next.is-ready { background: #72b31c; box-shadow: 0 0 0 4px #ffd600, 0 0 22px 6px rgba(255, 214, 0, 0.6); }
 
 /* ---- Wide layout (desktop, tablet, phone landscape) ---- */
-.ssc--wide .ssc-body { padding: 18px 120px 18px 12px; gap: 20px; }
+/* Bottom padding keeps the game box clear of Previous/Next and Tell Theresa, as the skill requires. */
+.ssc--wide .ssc-body { padding: 18px 24px 116px 12px; gap: 20px; }
 .ssc--wide .ssc-controls { flex-direction: column; align-self: flex-start; width: 190px; padding: 14px 10px; }
 .ssc--wide .ssc-helper { left: 40px; top: -6px; }
 .ssc--wide .ssc-prev { right: 118px; }

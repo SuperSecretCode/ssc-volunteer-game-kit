@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useLayoutEffect, useRef, useState } from 'react';
 import type { ComponentType } from 'react';
 import type { GameConfig, Lang, Stage, VolunteerGameProps } from '../contract';
 import { useShellAudio, type AudioItem } from './useShellAudio';
@@ -10,6 +10,34 @@ import './MockShell.css';
  * is never delivered. Your game only receives the props in contract.ts.
  */
 
+export type GameShape = '16:9' | '4:3' | '9:16';
+const RATIOS: Record<GameShape, number> = { '16:9': 16 / 9, '4:3': 4 / 3, '9:16': 9 / 16 };
+
+/**
+ * Like the real page: measure the free play area (between header and footer,
+ * clear of the controls) and give the game a centred box of the exact shape,
+ * as large as fits. contentRect ignores the preview zoom.
+ */
+function useGameBox(shape: GameShape) {
+  const areaRef = useRef<HTMLElement>(null);
+  const [box, setBox] = useState({ width: 0, height: 0 });
+  useLayoutEffect(() => {
+    const area = areaRef.current;
+    if (!area) return;
+    const fit = (width: number, height: number) => {
+      const ratio = RATIOS[shape];
+      const w = Math.floor(Math.min(width, height * ratio));
+      const next = { width: w, height: Math.floor(w / ratio) };
+      setBox((prev) => (prev.width === next.width && prev.height === next.height ? prev : next));
+    };
+    fit(area.clientWidth, area.clientHeight);
+    const observer = new ResizeObserver(([entry]) => fit(entry.contentRect.width, entry.contentRect.height));
+    observer.observe(area);
+    return () => observer.disconnect();
+  }, [shape]);
+  return { areaRef, box };
+}
+
 type Props = {
   config: GameConfig;
   Game: ComponentType<VolunteerGameProps>;
@@ -17,6 +45,8 @@ type Props = {
   layout: 'phone' | 'wide';
   /** Very short screens (phone landscape) get compact controls. */
   short?: boolean;
+  /** The exact shape of the box the game gets, as in the real app (step 4 of the skill). */
+  shape: GameShape;
   log: (message: string, level?: 'info' | 'warn') => void;
 };
 
@@ -25,7 +55,8 @@ const LABELS = {
   fr: { hint: 'indice', restart: 'recommencer', tell: 'Dis-le à Theresa', helper: 'Aide', splash: 'Prépare-toi pour une mission-jeu !', start: 'Commencer', play: 'Écouter les consignes', pause: 'Pause' },
 } as const;
 
-export default function MockShell({ config, Game, startLang, layout, short = false, log }: Props) {
+export default function MockShell({ config, Game, startLang, layout, short = false, shape, log }: Props) {
+  const { areaRef, box } = useGameBox(shape);
   const [lang, setLang] = useState<Lang>(startLang);
   const [hintRequest, setHintRequest] = useState(0);
   const [restartRequest, setRestartRequest] = useState(0);
@@ -235,8 +266,9 @@ export default function MockShell({ config, Game, startLang, layout, short = fal
           </div>
         </aside>
 
-        <main className="ssc-play">
-          <Game
+        <main className="ssc-play" ref={areaRef}>
+          <div className="ssc-game-box" style={{ width: box.width, height: box.height }} title={`Game box ${shape}: ${box.width} × ${box.height}`}>
+          {box.width > 0 && <Game
             lang={lang}
             hintRequest={hintRequest}
             restartRequest={restartRequest}
@@ -247,7 +279,8 @@ export default function MockShell({ config, Game, startLang, layout, short = fal
             onGameComplete={onGameComplete}
             onAudioCue={onAudioCue}
             onAudioStop={onAudioStop}
-          />
+          />}
+          </div>
         </main>
 
         <div className="ssc-footer-left">
