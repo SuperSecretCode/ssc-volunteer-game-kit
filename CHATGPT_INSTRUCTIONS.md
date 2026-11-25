@@ -1,7 +1,7 @@
 # Paste this at the start of every game chat
 
-Copy everything in the box below into a new ChatGPT chat, then attach these three files from the kit:
-`src/contract.ts`, `src/game/game.config.ts` and `src/game/MyGame.tsx`.
+Copy everything in the box below into a new ChatGPT chat, then attach these five files from the kit:
+`src/contract.ts`, `src/game/game.config.ts`, `src/game/layout.json`, `src/game/layoutRuntime.ts` and `src/game/MyGame.tsx`.
 
 ---
 
@@ -12,7 +12,7 @@ WHAT TO BUILD
 - Build ONLY the play area, as ONE React + TypeScript component (.tsx). That file is the game.
 - Do NOT make a standalone HTML version, an HTML preview, or an iframe wrapper. If I ask to "preview" or "fix" the game, change the .tsx.
 - The component's props must be exactly VolunteerGameProps from the attached contract.ts. Do not change contract.ts.
-- Use MyGame.tsx (attached) as the pattern: TEXT object for both languages, LEVELS data, refs for timers, effects for hintRequest/restartRequest, stages reported with onStageEnter after render.
+- Use MyGame.tsx (attached) as the pattern: layout.json read through makeLayout (layoutRuntime.ts, never edit it), LEVELS data, refs for timers, effects for hintRequest/restartRequest, stages reported with onStageEnter after render.
 
 THE APP OWNS THESE — never draw them in the game
 - Hint, Restart, EN/FR language button, audio/play/listen buttons, the progress counter, Previous/Next, the header and the splash screen.
@@ -25,13 +25,20 @@ AUDIO
 - Call onAudioStop() when a recording should stop (leaving a room, closing a card).
 
 LANGUAGE
-- Every piece of child-facing text, including aria-labels and status messages, comes from TEXT[lang], with English and French written out.
+- Visible text lives in layout.json "text" (English and French) and is read with L.text(id). Screen-reader-only labels and alt text go in a LABELS object in the .tsx, in both languages.
 - A lang change must NOT restart the game, reset progress, re-run onStageEnter, or replay anything.
 
 PROGRESS AND COMPLETION
 - onProgress(0, total) first, then on every change. total must equal totalProgress in game.config.ts.
 - onLevelComplete(i) once per level. onGameComplete() once at the end. Guard both against double calls.
 - If there's an intro screen, put data-intro-start-cue={introStartCue || undefined} on the button that starts level 1, and only there.
+
+LAYOUT AND TUNING
+- Positions, sizes, rotation, layer, text size and per-device images live in layout.json, per device: desktop (16:9), tablet (4:3), phone (9:16); x, y, w, h in % of the box, x/y = top-left.
+- Put {...L.box(id, extraStyle)} on every element that should be tunable; use L.text(id) and L.src(id). Add new items and text to layout.json for all three devices.
+- The kit has its own Tune panel: do NOT build an editor, device frames, pretend controls, a test page, or import/export.
+- List the screens in game.config.ts "screens", and switch to tuning.screen whenever tuning.screenRequest changes. While tuning is present, taps on tunable items must not play.
+- Never save or load layout in localStorage. layout.json is the only source.
 
 CODE RULES
 - React state only: no document.querySelector, innerHTML or global mutable variables for game logic.
@@ -43,7 +50,7 @@ CODE RULES
 - Measure the box with ResizeObserver contentRect or clientWidth/clientHeight, never getBoundingClientRect (the app may zoom the page).
 
 WHEN YOU GIVE ME CODE
-- Give the complete .tsx file every time (not fragments), plus the complete game.config.ts whenever text, totals or recordings change.
+- Give the complete .tsx file every time (not fragments), plus the complete game.config.ts whenever text, totals or recordings change, and the complete layout.json whenever items or text change.
 - List every image and recording file the code uses, with exact names.
 ```
 

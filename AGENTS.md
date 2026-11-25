@@ -26,7 +26,7 @@ Hint, Restart, the EN/FR language button, audio/play/listen buttons, the progres
 
 ## Language
 
-- Every piece of child-facing text, including aria-labels, alt text and status messages, comes from a `TEXT[lang]` object with English and French written out.
+- Visible child-facing text lives in `src/game/layout.json` (`text`, English and French) and is read with `L.text(id)`. Screen-reader-only labels and alt text live in a `LABELS` object in the `.tsx`, in both languages.
 - A `lang` change must not restart the game, reset progress, re-run `onStageEnter`, or replay anything.
 
 ## Progress and completion
@@ -41,6 +41,14 @@ Hint, Restart, the EN/FR language button, audio/play/listen buttons, the progres
 - Desktop and tablet are the priority. On a phone the game must still fit and stay tappable; a simpler tall layout is fine.
 - Measure with `ResizeObserver` `contentRect` or `clientWidth`/`clientHeight`, never `getBoundingClientRect` (the app may zoom the page).
 
+## Layout and tuning
+
+- Positions, sizes, rotation, layer, text size and per-device images live in `src/game/layout.json` (per profile: desktop 16:9, tablet 4:3, phone 9:16; x, y, w, h in % of the box, x/y = top-left).
+- Read them with `makeLayout(layoutFile, tuning, size, lang)` from `src/game/layoutRuntime.ts` (never edit that helper). Spread `{...L.box(id, extraStyle)}` on every tunable element; use `L.text(id)` and `L.src(id)`. Follow `MyGame.tsx`.
+- The kit provides the Tune panel. Do NOT build an editor, device frames, pretend controls, a test page, or import/export into the game.
+- List screens in `game.config.ts` `screens`, and switch to `tuning.screen` whenever `tuning.screenRequest` changes. While `tuning` is present, taps on tunable items must not play (the kit selects/drags them).
+- Never save or load layout in localStorage. `layout.json` is the only source; the person pastes Tune's "Copy all" into it.
+
 ## Code rules
 
 - React state only: no `document.querySelector`, `innerHTML` or global mutable variables for game logic.
@@ -53,4 +61,4 @@ Hint, Restart, the EN/FR language button, audio/play/listen buttons, the progres
 
 - Run `npm run build`. It must finish with no TypeScript errors.
 - Run `npm run dev` and ask the person to play the game in the preview (Desktop and Tablet first, then a phone; both "Start in" languages; switch language mid-level). The callback log on the right must show no ⚠ lines.
-- When you finish, list every image and recording file the game uses, with exact names.
+- When you finish, list every image and recording file the game uses, with exact names, and remind the person to deliver `layout.json` and `layoutRuntime.ts` with the game.
