@@ -2,7 +2,14 @@
 
 @font-face {
   font-family: 'Rodger';
-  src: url('/fonts/Rodger.woff2') format('woff2');
+  src: url('/fonts/Rodger-Regular.woff2') format('woff2'), url('/fonts/Rodger-Regular.woff') format('woff');
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Rodger';
+  src: url('/fonts/Rodger-Bold.woff2') format('woff2'), url('/fonts/Rodger-Bold.woff') format('woff');
+  font-weight: 700;
   font-display: swap;
 }
 
