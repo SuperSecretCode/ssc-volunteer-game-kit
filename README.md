@@ -27,6 +27,12 @@ npm run dev
 
 Start each new game from a fresh copy of the kit, so games don't mix.
 
+**Where to keep your copies: on your computer, not in OneDrive.** Make a folder such as `C:\Users\<your name>\Projects\` and put each game's copy of the kit there, for example `Projects\secret-exhibit-mission-3\`.
+
+- `npm install` creates a `node_modules` folder with thousands of small files. OneDrive tries to sync them all, which slows your computer down and can cause install errors.
+- On many Windows computers, OneDrive also backs up your **Desktop** and **Documents** folders, so avoid those too.
+- OneDrive is only for finished games: see "What to deliver" below. Never copy `node_modules` there.
+
 ## The files
 
 | File | What it is | Edit it? |
