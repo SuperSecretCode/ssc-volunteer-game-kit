@@ -1,0 +1,332 @@
+/* PREVIEW ONLY: approximate look of the Super Secret Code game page. */
+
+@font-face {
+  font-family: 'Rodger';
+  src: url('/fonts/Rodger.woff2') format('woff2');
+  font-display: swap;
+}
+
+.ssc {
+  --purple: #6b16ff;
+  --lavender: #dfdcff;
+  --green: #6bb31c;
+  --font: 'Rodger', ui-rounded, 'Arial Rounded MT Bold', system-ui, sans-serif;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  overflow: clip; /* never scroll sideways, even when a control gets focus */
+  background: #fff;
+  color: #1d0b45;
+  font-family: var(--font);
+}
+.ssc button { font-family: var(--font); cursor: pointer; }
+.ssc button:disabled { cursor: default; }
+
+/* The app's yellow attention cue for the intro start button. */
+[data-intro-start-cue] {
+  animation: ssc-cue 1.2s ease-in-out infinite;
+  box-shadow: inset 0 0 0 4px #ffd600, 0 0 0 4px #ffd600;
+}
+@keyframes ssc-cue {
+  50% { box-shadow: inset 0 0 0 4px #ffd600, 0 0 18px 8px #ffd600; }
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-intro-start-cue] { animation: none; }
+}
+
+/* ---- Header ---- */
+.ssc-header {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 14px 24px;
+  background: #eafdd9;
+}
+.ssc-title {
+  padding: 14px 30px;
+  border-radius: 10px;
+  background: #000;
+  color: #fff;
+  font-size: 24px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.ssc-logo {
+  width: 58px; height: 58px;
+  border: 0; border-radius: 50%;
+  background: var(--purple);
+  display: grid; place-items: center;
+}
+.ssc-logo span {
+  width: 26px; height: 26px;
+  border-radius: 9px;
+  background: #fff;
+  box-shadow: inset 0 0 0 7px #fff, inset 0 0 0 20px var(--purple);
+}
+.ssc-header-right { margin-left: auto; display: flex; gap: 12px; align-items: center; }
+.ssc-home {
+  width: 72px; height: 72px;
+  border: 0; border-radius: 12px;
+  background: var(--purple);
+  display: grid; place-items: center;
+}
+.ssc-home span { width: 24px; height: 22px; background: #fff; border-radius: 10px 10px 4px 4px; }
+.ssc-recess {
+  height: 72px;
+  padding: 0 22px;
+  border: 3px solid #dfe3ff;
+  border-radius: 14px;
+  background: #fff;
+  font-size: 30px;
+  letter-spacing: 1px;
+}
+.ssc-recess b:nth-child(1) { color: #e53935; }
+.ssc-recess b:nth-child(2) { color: #f57c00; }
+.ssc-recess b:nth-child(3) { color: #43a047; }
+.ssc-recess b:nth-child(4) { color: #1e88e5; }
+.ssc-recess b:nth-child(5) { color: #8e24aa; }
+.ssc-recess b:nth-child(6) { color: var(--purple); }
+
+/* ---- Body and controls ---- */
+.ssc-body { position: relative; flex: 1; min-height: 0; display: flex; }
+.ssc-controls {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+}
+.ssc-player {
+  display: flex; align-items: center; gap: 10px;
+  padding: 6px 16px 6px 6px;
+  border: 3px solid var(--purple);
+  border-radius: 999px;
+  background: var(--lavender);
+}
+.ssc-player-btn {
+  width: 50px; height: 50px;
+  border-radius: 50%;
+  background: var(--purple);
+  color: #fff;
+  display: grid; place-items: center;
+  font-size: 18px;
+}
+.ssc-player.is-dim { opacity: 0.5; }
+.ssc-wave { display: flex; align-items: center; gap: 4px; height: 30px; }
+.ssc-wave i { width: 2px; height: 60%; background: var(--purple); border-radius: 2px; }
+.ssc-wave i:nth-child(odd) { height: 95%; }
+.ssc-wave i:nth-child(3n) { height: 40%; }
+.ssc-player.is-playing .ssc-wave i { animation: ssc-wave 0.7s ease-in-out infinite alternate; }
+@keyframes ssc-wave { to { transform: scaleY(0.35); } }
+
+.ssc-lang {
+  min-width: 52px; height: 46px;
+  border: 3px solid var(--purple);
+  border-radius: 8px;
+  background: var(--lavender);
+  color: var(--purple);
+  font-size: 17px; font-weight: 700;
+}
+.ssc-hint {
+  height: 50px; padding: 0 22px;
+  white-space: nowrap;
+  border: 0; border-radius: 999px;
+  background: #eee9fb;
+  color: #8b7bb8;
+  font-size: 18px;
+}
+.ssc-restart {
+  height: 46px; padding: 0 16px;
+  white-space: nowrap;
+  border: 3px solid #f2be22;
+  border-radius: 8px;
+  background: #fff3c4;
+  color: #2b1a00;
+  font-size: 17px; font-weight: 700;
+}
+.ssc-hint:disabled, .ssc-restart:disabled { opacity: 0.45; }
+.ssc-counter { color: var(--purple); font-size: 18px; font-weight: 700; white-space: nowrap; }
+.ssc-helper-wrap { position: relative; }
+.ssc-clipboard { border: 0; background: none; font-size: 24px; padding: 4px; }
+.ssc-helper {
+  position: absolute;
+  z-index: 5;
+  width: 290px;
+  padding: 14px 18px;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.16);
+  font-size: 17px;
+  line-height: 1.4;
+}
+
+.ssc-play { flex: 1; min-width: 0; min-height: 0; }
+
+/* ---- Footer controls ---- */
+.ssc-footer-left { position: absolute; left: 14px; bottom: 12px; display: flex; flex-direction: column; gap: 14px; align-items: flex-start; }
+.ssc-tell {
+  width: 108px; height: 108px;
+  border: 5px solid #e88006;
+  border-radius: 50%;
+  background: #62c9ff;
+  color: var(--purple);
+  font-size: 12px; font-weight: 700;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+}
+.ssc-tell span { font-size: 28px; }
+.ssc-tracker {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 18px;
+  border: 2px solid #e2dcff;
+  border-radius: 999px;
+  background: #fff;
+  color: var(--purple);
+  font-size: 18px;
+}
+.ssc-tracker i { width: 34px; height: 22px; border-radius: 6px; background: #2b0a2e; box-shadow: inset 0 0 0 9px #2b0a2e; position: relative; }
+.ssc-tracker i::after { content: ''; position: absolute; left: 5px; right: 5px; top: 10px; border-top: 2px dashed #ffd600; }
+.ssc-prev, .ssc-next {
+  position: absolute;
+  bottom: 14px;
+  width: 92px; height: 92px;
+  border: 0; border-radius: 50%;
+  color: #fff;
+  font-size: 44px; line-height: 1;
+}
+.ssc-prev { background: var(--green); }
+.ssc-next { background: #d7f0b5; }
+.ssc-next.is-ready { background: #72b31c; box-shadow: 0 0 0 4px #ffd600, 0 0 22px 6px rgba(255, 214, 0, 0.6); }
+
+/* ---- Wide layout (desktop, tablet, phone landscape) ---- */
+.ssc--wide .ssc-body { padding: 18px 120px 18px 12px; gap: 20px; }
+.ssc--wide .ssc-controls { flex-direction: column; align-self: flex-start; width: 190px; padding: 14px 10px; }
+.ssc--wide .ssc-helper { left: 40px; top: -6px; }
+.ssc--wide .ssc-prev { right: 118px; }
+.ssc--wide .ssc-next { right: 14px; }
+
+/* ---- Phone portrait layout ---- */
+.ssc--phone .ssc-header { padding: 10px 14px; }
+.ssc--phone .ssc-logo { width: 48px; height: 48px; }
+.ssc--phone .ssc-home { width: 58px; height: 58px; }
+.ssc--phone .ssc-recess { height: 58px; font-size: 24px; padding: 0 14px; }
+.ssc--phone .ssc-body { flex-direction: column; padding: 8px 8px 224px; gap: 10px; }
+.ssc--phone .ssc-controls { justify-content: space-between; gap: 5px; padding: 10px 8px; min-width: 0; }
+.ssc--phone .ssc-controls > * { flex-shrink: 1; min-width: 0; }
+.ssc--phone .ssc-wave i:nth-child(n + 6) { display: none; }
+.ssc--phone .ssc-player { padding: 4px 10px 4px 4px; gap: 6px; }
+.ssc--phone .ssc-player-btn { width: 40px; height: 40px; font-size: 14px; }
+.ssc--phone .ssc-wave { height: 24px; gap: 3px; }
+.ssc--phone .ssc-lang { min-width: 42px; height: 40px; font-size: 14px; }
+.ssc--phone .ssc-hint { height: 40px; padding: 0 9px; font-size: 13px; }
+.ssc--phone .ssc-hint span { display: none; }
+.ssc--phone .ssc-restart { height: 40px; padding: 0 6px; font-size: 13px; overflow: hidden; text-overflow: ellipsis; }
+.ssc--phone .ssc-counter { font-size: 14px; }
+.ssc--phone .ssc-clipboard { font-size: 20px; padding: 0; }
+.ssc--phone .ssc-helper { right: -4px; top: 42px; width: 230px; font-size: 15px; }
+.ssc--phone .ssc-footer-left { bottom: 74px; }
+.ssc--phone .ssc-tell { width: 84px; height: 84px; font-size: 10px; }
+.ssc--phone .ssc-tell span { font-size: 22px; }
+.ssc--phone .ssc-tracker { padding: 6px 12px; }
+.ssc--phone .ssc-prev, .ssc--phone .ssc-next { width: 52px; height: 52px; font-size: 30px; bottom: 12px; }
+.ssc--phone .ssc-prev { left: 18px; }
+.ssc--phone .ssc-next { right: 14px; }
+
+/* ---- Short screens (phone landscape): compact header and controls ---- */
+.ssc--short .ssc-header { padding: 6px 14px; gap: 10px; }
+.ssc--short .ssc-title { padding: 6px 14px; font-size: 16px; }
+.ssc--short .ssc-logo { width: 38px; height: 38px; }
+.ssc--short .ssc-home, .ssc--short .ssc-recess { height: 44px; }
+.ssc--short .ssc-home { width: 44px; }
+.ssc--short .ssc-recess { font-size: 18px; padding: 0 12px; }
+.ssc--short .ssc-body { padding: 8px 128px 8px 8px; gap: 10px; }
+.ssc--short .ssc-controls { width: 128px; gap: 6px; padding: 8px 6px; }
+.ssc--short .ssc-player { padding: 3px 8px 3px 3px; gap: 4px; }
+.ssc--short .ssc-player-btn { width: 30px; height: 30px; font-size: 11px; }
+.ssc--short .ssc-wave { height: 18px; gap: 3px; }
+.ssc--short .ssc-wave i:nth-child(n + 7) { display: none; }
+.ssc--short .ssc-lang, .ssc--short .ssc-hint, .ssc--short .ssc-restart { height: 32px; font-size: 13px; padding: 0 8px; min-width: 0; }
+.ssc--short .ssc-counter { font-size: 14px; }
+.ssc--short .ssc-clipboard { font-size: 18px; }
+.ssc--short .ssc-footer-left { left: auto; right: 10px; top: 8px; bottom: auto; flex-direction: row; align-items: center; gap: 6px; }
+.ssc--short .ssc-tell { width: 52px; height: 52px; border-width: 3px; font-size: 0; }
+.ssc--short .ssc-tell span { font-size: 20px; }
+.ssc--short .ssc-tracker { display: none; }
+.ssc--short .ssc-prev, .ssc--short .ssc-next { width: 52px; height: 52px; font-size: 30px; bottom: 10px; }
+.ssc--short .ssc-prev { right: 68px; }
+.ssc--short .ssc-next { right: 10px; }
+
+/* ---- Splash and toast ---- */
+.ssc-splash {
+  position: absolute; inset: 0; z-index: 20;
+  overflow: hidden;
+  background: radial-gradient(circle at 50% 38%, #ffffff 0%, #ececf0 75%);
+}
+/* Previous/Next and the tracker toggle stay visible on the splash; the controls card and Tell Theresa don't. */
+.ssc.is-splash .ssc-prev, .ssc.is-splash .ssc-next, .ssc.is-splash .ssc-footer-left { z-index: 25; }
+.ssc.is-splash .ssc-tell { display: none; }
+.ssc-splash-top { position: absolute; top: 14px; right: 24px; display: flex; gap: 12px; }
+.ssc-splash-floor {
+  position: absolute; left: -40%; right: -40%; bottom: -2%; height: 30%;
+  background: repeating-conic-gradient(#111 0 25%, #fff 0 50%) 0 0 / 160px 160px;
+  transform: perspective(600px) rotateX(48deg);
+  transform-origin: 50% 100%;
+}
+.ssc-splash-center {
+  position: absolute; left: 0; right: 0; top: 16%;
+  display: flex; flex-direction: column; align-items: center; gap: 28px;
+  padding: 0 20px;
+}
+.ssc-splash-avatar {
+  width: 120px; height: 140px;
+  border: 3px dashed #b9a8ff; border-radius: 24px;
+  display: grid; place-items: center;
+  color: #9a88e6; font-size: 14px;
+  animation: ssc-float 3s ease-in-out infinite;
+}
+@keyframes ssc-float { 50% { transform: translateY(-10px); } }
+.ssc-splash-banner {
+  width: min(680px, 100%);
+  padding: 22px 28px;
+  border-radius: 16px;
+  background: var(--purple);
+  text-align: center;
+}
+.ssc-splash-primary { margin: 0 0 12px; color: #fff; font-size: 34px; font-weight: 700; }
+.ssc-splash-secondary { margin: 0; color: #d9c8ff; font-size: 26px; font-weight: 700; }
+.ssc-splash-start {
+  min-width: 180px; min-height: 56px;
+  border: 4px solid #fff; border-radius: 999px;
+  background: #c3ff92; color: #1d0b45;
+  font-size: 22px; font-weight: 700;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
+}
+.ssc--phone .ssc-splash-top { right: 14px; top: 10px; }
+.ssc--phone .ssc-splash-center { top: 24%; gap: 22px; padding: 0 28px; }
+.ssc--phone .ssc-splash-avatar { width: 80px; height: 100px; font-size: 12px; }
+.ssc--phone .ssc-splash-banner { padding: 18px 14px; }
+.ssc--phone .ssc-splash-primary { font-size: 19px; margin-bottom: 8px; }
+.ssc--phone .ssc-splash-secondary { font-size: 15px; }
+.ssc--phone .ssc-splash-start { min-height: 48px; font-size: 18px; }
+.ssc--phone.is-splash .ssc-footer-left { left: 50%; bottom: 12px; transform: translateX(-50%); }
+.ssc--short .ssc-splash-center { top: 64px; gap: 10px; }
+.ssc--short .ssc-splash-avatar { width: 50px; height: 56px; font-size: 10px; }
+.ssc--short .ssc-splash-banner { padding: 10px 16px; width: min(520px, 100%); }
+.ssc--short .ssc-splash-primary { font-size: 20px; margin-bottom: 4px; }
+.ssc--short .ssc-splash-secondary { font-size: 15px; }
+.ssc--short .ssc-splash-start { min-height: 44px; font-size: 17px; }
+.ssc--short.is-splash .ssc-footer-left { top: auto; bottom: 14px; left: 14px; right: auto; }
+.ssc-toast {
+  position: absolute; left: 50%; bottom: 120px; z-index: 30;
+  transform: translateX(-50%);
+  padding: 10px 18px;
+  border-radius: 999px;
+  background: #1d0b45; color: #fff;
+  font-size: 15px;
+  white-space: nowrap;
+}

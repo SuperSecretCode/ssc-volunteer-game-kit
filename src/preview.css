@@ -1,0 +1,21 @@
+/* Preview tools only (grey bar, device frame, log). Not part of the app. */
+* { box-sizing: border-box; }
+html, body, #root { margin: 0; height: 100%; }
+body { font-family: system-ui, sans-serif; background: #d9d9de; color: #222; }
+.preview { height: 100%; display: flex; flex-direction: column; }
+.preview-bar { flex: none; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; padding: 8px 12px; background: #3a3a44; color: #fff; font-size: 13px; }
+.preview-name { margin-right: 8px; }
+.preview-group { display: flex; flex-wrap: wrap; gap: 4px; }
+.preview-bar button, .preview-bar select { font: inherit; padding: 5px 10px; border-radius: 6px; border: 1px solid #666; background: #50505c; color: #fff; cursor: pointer; }
+.preview-bar button[aria-pressed="true"] { background: #fff; color: #222; }
+.preview-select { display: flex; align-items: center; gap: 6px; }
+.preview-main { flex: 1; min-height: 0; display: flex; }
+.preview-stage { flex: 1; min-width: 0; display: grid; place-items: center; overflow: hidden; }
+.preview-device { overflow: hidden; border-radius: 18px; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3); background: #fff; }
+.preview-log { width: 340px; flex: none; overflow: auto; padding: 12px 14px; background: #f4f4f7; border-left: 1px solid #c7c7cf; font-size: 12.5px; }
+.preview-log h2 { margin: 0 0 4px; font-size: 14px; }
+.preview-hint { margin: 0 0 10px; color: #666; }
+.preview-log ol { list-style: none; margin: 0; padding: 0; }
+.preview-log li { padding: 4px 0; border-bottom: 1px solid #e2e2e8; }
+.preview-log li.is-warn { color: #a12400; font-weight: 600; }
+.preview-log time { color: #888; margin-right: 4px; font-variant-numeric: tabular-nums; }

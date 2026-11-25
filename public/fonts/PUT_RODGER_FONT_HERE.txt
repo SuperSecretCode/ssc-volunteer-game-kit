@@ -1,0 +1,7 @@
+Put the Rodger font file Theresa sends you in this folder, named:
+
+  Rodger.woff2
+
+The mock shell and the starter game use the font family 'Rodger'.
+Until the file is here, the preview falls back to a similar rounded font,
+so text sizes may look slightly different from the real app.
