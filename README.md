@@ -82,7 +82,7 @@ The app passes these props to your game (details in `src/contract.ts`):
 
 ### Look and feel
 
-- Font: `font-family: 'Rodger', sans-serif` on all child-facing text, **including buttons** (buttons don't inherit fonts). `font-rodger` is not a font name. If Theresa sends you `Rodger.woff2`, put it in `public/fonts/`.
+- Font: `font-family: 'Rodger', sans-serif` on all child-facing text, **including buttons** (buttons don't inherit fonts). `font-rodger` is not a font name. The Rodger font files are already in `public/fonts/`.
 - Images: WebP. Preload each level's images so nothing pops in late.
 - Tap targets at least 44 × 44 px.
 - **Size:** the app gives your game a box with an exact shape, as large as fits on the screen: **16:9 on desktop, 4:3 on tablet, 9:16 on phone portrait**. Fill the whole box, position things in %, and keep everything inside it. The starter shows how to switch layouts by the box's shape. (In the preview, a faint dashed line shows the box.)
