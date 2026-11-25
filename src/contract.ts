@@ -6,6 +6,12 @@
  * the header, the purple audio player, the EN/FR button, Hint, Restart,
  * the progress counter, helper text, the splash screen and Previous/Next.
  * Never draw your own versions of these inside the game.
+ *
+ * SIZE: the shell gives your game a box with an exact shape, as large as fits:
+ * 16:9 on desktop, 4:3 on tablet, 9:16 on phone portrait. Fill the whole box,
+ * position things in %, and pick your layout from the box's shape. Measure it
+ * with ResizeObserver's contentRect or clientWidth/clientHeight, never
+ * getBoundingClientRect (the app may zoom the page).
  */
 
 export type Lang = 'en' | 'fr';

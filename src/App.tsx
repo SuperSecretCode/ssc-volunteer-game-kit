@@ -8,12 +8,13 @@ import MyGame from './game/MyGame';
 /** PREVIEW TOOLS ONLY — the grey bar and log are never part of the app. */
 
 // Desktop and tablet come first: they're the priority for games.
+// shape = the box the app gives the game on that device.
 const DEVICES = {
-  desktop: { label: 'Desktop', width: 1440, height: 900 },
-  tablet: { label: 'Tablet landscape', width: 1180, height: 820 },
-  tabletPortrait: { label: 'Tablet portrait', width: 820, height: 1180 },
-  phoneLandscape: { label: 'Phone landscape', width: 844, height: 390 },
-  phone: { label: 'Phone portrait', width: 390, height: 844 },
+  desktop: { label: 'Desktop', width: 1440, height: 900, shape: '16:9' },
+  tablet: { label: 'Tablet landscape', width: 1180, height: 820, shape: '4:3' },
+  tabletPortrait: { label: 'Tablet portrait', width: 820, height: 1180, shape: '4:3' },
+  phoneLandscape: { label: 'Phone landscape', width: 844, height: 390, shape: '16:9' },
+  phone: { label: 'Phone portrait', width: 390, height: 844, shape: '9:16' },
 } as const;
 type DeviceId = keyof typeof DEVICES;
 
@@ -35,7 +36,7 @@ export default function App() {
     setEntries((list) => [{ id: nextId.current++, time, message, level }, ...list].slice(0, 80));
   }, []);
 
-  const { width, height } = DEVICES[device];
+  const { width, height, shape } = DEVICES[device];
   // The real app shows its phone layout on narrow screens.
   const layout = width < 700 ? 'phone' : 'wide';
   const short = height < 520; // phone landscape: compact controls
@@ -102,6 +103,7 @@ export default function App() {
                 startLang={startLang}
                 layout={layout}
                 short={short}
+                shape={shape}
                 log={log}
               />
             </div>
