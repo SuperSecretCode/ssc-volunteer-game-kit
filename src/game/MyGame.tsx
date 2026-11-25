@@ -37,8 +37,8 @@ const TEXT = {
 type Point = { id: string; x: number; y: number };
 
 /**
- * Each level has positions for a wide layout (desktop and tablet, the priority)
- * and a tall layout (phone portrait). Get the wide layout right first; the
+ * Each level has positions for a wide layout (desktop 16:9 and tablet 4:3, the
+ * priority) and a tall layout (phone portrait 9:16). Get the wide layout right first; the
  * tall one just has to keep everything visible and tappable on a phone.
  * Image paths: put files in public/game-assets/ and reference them as
  * '/game-assets/<file>.webp'. Use WebP for every image.
@@ -87,7 +87,15 @@ const FONT = "'Rodger', 'Fredoka', 'Nunito', system-ui, sans-serif";
 
 type Shape = 'wide' | 'tall';
 
-/** Fits a 16:9 (wide) or 9:16-ish (tall) scene inside whatever box the shell gives. */
+/**
+ * The app gives your game a box with an exact shape: 16:9 on desktop,
+ * 4:3 on tablet, 9:16 on phone portrait. Fill the whole box and position
+ * things in % so they scale. Pick a wide or tall layout from the box's shape.
+ *
+ * Measure with ResizeObserver's contentRect (or clientWidth/clientHeight),
+ * NEVER getBoundingClientRect: the app may zoom the page, and
+ * getBoundingClientRect would count the zoom twice.
+ */
 function useSceneSize() {
   const boxRef = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState({ width: 0, height: 0, shape: 'wide' as Shape });
@@ -95,19 +103,15 @@ function useSceneSize() {
   useLayoutEffect(() => {
     const box = boxRef.current;
     if (!box) return;
-    const measure = () => {
-      const { width, height } = box.getBoundingClientRect();
+    const update = (width: number, height: number) => {
       if (!width || !height) return;
-      const shape: Shape = height > width * 1.15 ? 'tall' : 'wide';
-      const ratio = shape === 'wide' ? 16 / 9 : 9 / 14;
-      const fitWidth = Math.min(width, height * ratio);
-      const next = { width: Math.floor(fitWidth), height: Math.floor(fitWidth / ratio), shape };
+      const next = { width: Math.round(width), height: Math.round(height), shape: (height > width ? 'tall' : 'wide') as Shape };
       setSize((prev) =>
         prev.width === next.width && prev.height === next.height && prev.shape === next.shape ? prev : next,
       );
     };
-    measure();
-    const observer = new ResizeObserver(measure);
+    update(box.clientWidth, box.clientHeight);
+    const observer = new ResizeObserver(([entry]) => update(entry.contentRect.width, entry.contentRect.height));
     observer.observe(box);
     return () => observer.disconnect();
   }, []);
@@ -286,8 +290,6 @@ const styles: Record<string, CSSProperties> = {
   box: {
     width: '100%',
     height: '100%',
-    display: 'grid',
-    placeItems: 'center',
     overflow: 'hidden',
   },
   scene: {
