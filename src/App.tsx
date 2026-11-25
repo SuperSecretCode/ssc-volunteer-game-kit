@@ -7,19 +7,20 @@ import MyGame from './game/MyGame';
 
 /** PREVIEW TOOLS ONLY — the grey bar and log are never part of the app. */
 
+// Desktop and tablet come first: they're the priority for games.
 const DEVICES = {
-  phone: { label: 'Phone portrait', width: 390, height: 844 },
-  phoneLandscape: { label: 'Phone landscape', width: 844, height: 390 },
-  tabletPortrait: { label: 'Tablet portrait', width: 820, height: 1180 },
-  tablet: { label: 'Tablet landscape', width: 1180, height: 820 },
   desktop: { label: 'Desktop', width: 1440, height: 900 },
+  tablet: { label: 'Tablet landscape', width: 1180, height: 820 },
+  tabletPortrait: { label: 'Tablet portrait', width: 820, height: 1180 },
+  phoneLandscape: { label: 'Phone landscape', width: 844, height: 390 },
+  phone: { label: 'Phone portrait', width: 390, height: 844 },
 } as const;
 type DeviceId = keyof typeof DEVICES;
 
 type LogEntry = { id: number; time: string; message: string; level: 'info' | 'warn' };
 
 export default function App() {
-  const [device, setDevice] = useState<DeviceId>('phone');
+  const [device, setDevice] = useState<DeviceId>('desktop');
   const [startLang, setStartLang] = useState<Lang>(GAME_CONFIG.pageLanguage);
   const [visit, setVisit] = useState(0);
   const [entries, setEntries] = useState<LogEntry[]>([]);
