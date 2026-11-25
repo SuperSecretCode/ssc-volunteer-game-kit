@@ -34,7 +34,7 @@ Open the address it prints (usually http://localhost:5173).
 
 ## The preview tools (grey bar)
 
-- **Device buttons:** phone portrait, phone landscape, tablet and desktop. **Phone portrait matters most.** Super Secret Code is designed for phones held upright, so use that tall space; don't just shrink a landscape scene.
+- **Device buttons:** desktop, tablet (landscape and portrait) and phone. **Desktop and tablet matter most** for games, so design for those first. On phones the game still has to fit, with everything visible and tappable, but it doesn't need its own special layout.
 - **Start in:** English page or French page. French blocks start in French; English blocks start in English. Test both.
 - **Fresh visit:** starts over as if a child just opened the page.
 - **Callback log:** shows everything your game tells the app. **⚠ lines are problems to fix before you deliver.**
@@ -75,7 +75,7 @@ The app passes these props to your game (details in `src/contract.ts`):
 ## Before you deliver: checklist
 
 - [ ] The callback log shows **no ⚠ lines** in a full play-through.
-- [ ] Played start to finish on **phone portrait**, tablet and desktop.
+- [ ] Played start to finish on **desktop and tablet**, and checked it still fits and works on a phone.
 - [ ] Played starting on the **French page** and on the **English page**, and switched language mid-level: text changed, the game didn't restart.
 - [ ] Hint and Restart work on every level.
 - [ ] The intro recording plays after the splash Start; the start button glows yellow when it ends.

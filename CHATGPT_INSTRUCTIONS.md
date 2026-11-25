@@ -39,7 +39,7 @@ CODE RULES
 - Images: WebP files under /game-assets/ (for example '/game-assets/room-1.webp'). Preload the current level's images.
 - Font: fontFamily "'Rodger', sans-serif" on all child-facing text, including every button.
 - Tap targets at least 44×44 px.
-- Design for PHONE PORTRAIT first: the game fills whatever box it's given; choose a tall layout when the box is taller than wide (see useSceneSize in MyGame.tsx) and a wide layout otherwise. Keep everything inside the box.
+- Design for DESKTOP AND TABLET first (landscape, roughly 16:9 on desktop and 4:3 on tablet). The game fills whatever box it's given and must keep everything inside it. On a phone it still has to fit and stay tappable; a simpler tall layout is fine there (see useSceneSize in MyGame.tsx).
 
 WHEN YOU GIVE ME CODE
 - Give the complete .tsx file every time (not fragments), plus the complete game.config.ts whenever text, totals or recordings change.
@@ -50,6 +50,6 @@ WHEN YOU GIVE ME CODE
 
 ## Tips
 
-- After each ChatGPT answer, paste the new `.tsx` into the kit, play it in **phone portrait**, and watch the callback log. Copy any ⚠ lines back into the chat so ChatGPT can fix them.
+- After each ChatGPT answer, paste the new `.tsx` into the kit, play it on **desktop and tablet** (then check a phone), and watch the callback log. Copy any ⚠ lines back into the chat so ChatGPT can fix them.
 - If ChatGPT offers an HTML version "so you can preview it", say no: the kit is your preview.
 - Keep one chat per game, and start a fresh one (with this text again) if it starts forgetting the rules.
