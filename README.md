@@ -106,6 +106,7 @@ Then let Theresa know it's there.
 
 **Don't include:** HTML preview files, `App.tsx`, the `shell/` folder, `contract.ts`, `package.json` or `node_modules`.
 
-## Building the game with ChatGPT
+## Building the game with an AI assistant
 
-See `CHATGPT_INSTRUCTIONS.md`. Paste it at the start of every game chat.
+- **ChatGPT (in the chat window):** see `CHATGPT_INSTRUCTIONS.md`. Paste it at the start of every game chat.
+- **Codex (or another coding agent that works in this folder):** open Codex in the kit folder. It reads `AGENTS.md` automatically, which has the same rules, so you can just describe the game. Codex can also run `npm install` and `npm run dev` for you, but it still needs Node.js installed.
