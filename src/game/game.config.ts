@@ -54,4 +54,11 @@ export const GAME_CONFIG: GameConfig = {
       fr: '/game-assets/audio/demo-game-complete-fr.wav',
     },
   },
+
+  screens: [
+    { id: 'intro', label: 'Intro' },
+    { id: 'level-1', label: 'Level 1' },
+    { id: 'level-2', label: 'Level 2' },
+    { id: 'success', label: 'Success' },
+  ],
 };

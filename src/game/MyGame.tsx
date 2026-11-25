@@ -1,122 +1,72 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import type { CSSProperties } from 'react';
 import type { Stage, VolunteerGameProps } from '../contract';
+import layoutFile from './layout.json';
+import { makeLayout, profileFor, type LayoutFile, type Profile } from './layoutRuntime';
 
 /**
  * STARTER GAME — copy this file, rename it for your game, and replace the
  * gameplay. Keep the structure:
- *   - all child-facing text in TEXT (both languages)
- *   - all levels, positions and image paths in LEVELS
+ *   - positions, sizes, layers, per-device images and visible text: layout.json
+ *     (read through makeLayout, so the kit's Tune panel can edit them)
+ *   - screen-reader-only labels: LABELS below (both languages)
  *   - the shell controls (hint, restart, language, audio) come in as props
  *   - report stages, progress and completion through the callbacks
  *
  * This file is the GAME. Never build or fix the game in a separate HTML file.
  */
 
-const TEXT = {
-  en: {
-    introTitle: 'The Night Sky',
-    introBody: 'The stars went out! Help Cody light them up again.',
-    start: 'Start the mission',
-    instruction: 'Tap every star.',
-    target: (n: number) => `Star ${n}`,
-    levelComplete: 'Level complete!',
-    gameComplete: 'The sky is bright again!',
-  },
-  fr: {
-    introTitle: 'Le ciel de nuit',
-    introBody: 'Les étoiles se sont éteintes ! Aide Cody à les rallumer.',
-    start: 'Commencer la mission',
-    instruction: 'Touche toutes les étoiles.',
-    target: (n: number) => `Étoile ${n}`,
-    levelComplete: 'Niveau terminé !',
-    gameComplete: 'Le ciel brille de nouveau !',
-  },
+const LAYOUT = layoutFile as LayoutFile;
+
+/** Labels only screen readers hear. Visible text lives in layout.json. */
+const LABELS = {
+  en: { target: (n: number) => `Star ${n}` },
+  fr: { target: (n: number) => `Étoile ${n}` },
 } as const;
 
-type Point = { id: string; x: number; y: number };
+/** What is in each level. Where things sit is in layout.json (ids must match). */
+const LEVELS = [
+  { id: 'level-1', targets: ['star-1', 'star-2', 'star-3'] },
+  { id: 'level-2', targets: ['star-4', 'star-5'] },
+] as const;
 
-/**
- * Each level has positions for a wide layout (desktop 16:9 and tablet 4:3, the
- * priority) and a tall layout (phone portrait 9:16). Get the wide layout right first; the
- * tall one just has to keep everything visible and tappable on a phone.
- * Image paths: put files in public/game-assets/ and reference them as
- * '/game-assets/<file>.webp'. Use WebP for every image.
- */
-type Level = {
-  id: string;
-  background: string; // use an image: `url('/game-assets/level-1.webp')`
-  targets: { wide: readonly Point[]; tall: readonly Point[] };
-};
-
-const LEVELS: readonly Level[] = [
-  {
-    id: 'level-1',
-    background: 'linear-gradient(160deg, #1b1464, #4a1c8c)',
-    targets: {
-      wide: [
-        { id: 'star-1', x: 22, y: 35 },
-        { id: 'star-2', x: 50, y: 62 },
-        { id: 'star-3', x: 78, y: 35 },
-      ],
-      tall: [
-        { id: 'star-1', x: 30, y: 25 },
-        { id: 'star-2', x: 70, y: 48 },
-        { id: 'star-3', x: 35, y: 72 },
-      ],
-    },
-  },
-  {
-    id: 'level-2',
-    background: 'linear-gradient(160deg, #0d3b66, #1b1464)',
-    targets: {
-      wide: [
-        { id: 'star-4', x: 32, y: 50 },
-        { id: 'star-5', x: 68, y: 50 },
-      ],
-      tall: [
-        { id: 'star-4', x: 50, y: 30 },
-        { id: 'star-5', x: 50, y: 66 },
-      ],
-    },
-  },
-];
-
-const TOTAL = LEVELS.reduce((sum, level) => sum + level.targets.wide.length, 0);
+const TOTAL = LEVELS.reduce((sum, level) => sum + level.targets.length, 0);
 const FONT = "'Rodger', 'Fredoka', 'Nunito', system-ui, sans-serif";
-
-type Shape = 'wide' | 'tall';
 
 /**
  * The app gives your game a box with an exact shape: 16:9 on desktop,
- * 4:3 on tablet, 9:16 on phone portrait. Fill the whole box and position
- * things in % so they scale. Pick a wide or tall layout from the box's shape.
- *
+ * 4:3 on tablet, 9:16 on phone portrait. Fill the whole box.
  * Measure with ResizeObserver's contentRect (or clientWidth/clientHeight),
- * NEVER getBoundingClientRect: the app may zoom the page, and
- * getBoundingClientRect would count the zoom twice.
+ * NEVER getBoundingClientRect: the app may zoom the page.
  */
-function useSceneSize() {
+function useBoxSize() {
   const boxRef = useRef<HTMLDivElement>(null);
-  const [size, setSize] = useState({ width: 0, height: 0, shape: 'wide' as Shape });
-
+  const [size, setSize] = useState({ width: 0, height: 0, profile: 'desktop' as Profile });
   useLayoutEffect(() => {
-    const box = boxRef.current;
-    if (!box) return;
+    const el = boxRef.current;
+    if (!el) return;
     const update = (width: number, height: number) => {
       if (!width || !height) return;
-      const next = { width: Math.round(width), height: Math.round(height), shape: (height > width ? 'tall' : 'wide') as Shape };
+      const next = { width: Math.round(width), height: Math.round(height), profile: profileFor(width, height) };
       setSize((prev) =>
-        prev.width === next.width && prev.height === next.height && prev.shape === next.shape ? prev : next,
+        prev.width === next.width && prev.height === next.height && prev.profile === next.profile ? prev : next,
       );
     };
-    update(box.clientWidth, box.clientHeight);
+    update(el.clientWidth, el.clientHeight);
     const observer = new ResizeObserver(([entry]) => update(entry.contentRect.width, entry.contentRect.height));
-    observer.observe(box);
+    observer.observe(el);
     return () => observer.disconnect();
   }, []);
-
   return { boxRef, size };
+}
+
+/** Preload every image this device's layout uses, so nothing pops in late. */
+function usePreload(profile: Profile) {
+  useEffect(() => {
+    Object.values(LAYOUT.profiles[profile]).forEach((item) => {
+      if (item.src) new Image().src = item.src;
+    });
+  }, [profile]);
 }
 
 export default function MyGame({
@@ -124,23 +74,26 @@ export default function MyGame({
   hintRequest,
   restartRequest,
   introStartCue,
+  tuning,
   onProgress,
   onStageEnter,
   onLevelComplete,
   onGameComplete,
   onAudioCue,
 }: VolunteerGameProps) {
-  const t = TEXT[lang];
-  const [stage, setStage] = useState<Stage>('intro');
+  const [stage, setStage] = useState<Stage | 'success'>('intro');
   const [found, setFound] = useState<Set<string>>(() => new Set());
   const [hintedId, setHintedId] = useState<string | null>(null);
-  const [finished, setFinished] = useState(false);
   const timers = useRef(new Set<ReturnType<typeof setTimeout>>());
   const lastHint = useRef(hintRequest);
   const lastRestart = useRef(restartRequest);
+  const lastScreenRequest = useRef(tuning?.screenRequest ?? 0);
   const reportedLevels = useRef(new Set<number>());
   const reportedGame = useRef(false);
-  const { boxRef, size } = useSceneSize();
+  const { boxRef, size } = useBoxSize();
+  usePreload(size.profile);
+
+  const L = makeLayout(LAYOUT, tuning, size, lang);
 
   // Keep the latest callbacks without re-running effects when the parent re-renders.
   const callbacks = useRef({ onProgress, onStageEnter, onLevelComplete, onGameComplete, onAudioCue });
@@ -153,132 +106,147 @@ export default function MyGame({
     }, ms);
     timers.current.add(id);
   }, []);
+  const clearTimers = () => {
+    timers.current.forEach(clearTimeout);
+    timers.current.clear();
+  };
 
-  // Clean up every timer when the game is removed.
   useEffect(() => {
     const pending = timers.current;
     return () => pending.forEach(clearTimeout);
   }, []);
 
-  // Report each stage AFTER it is visibly on screen. Depends on `stage` only,
-  // so a language change never re-reports a stage.
+  // Report each stage AFTER it is on screen. A language change never re-reports.
   useEffect(() => {
+    if (stage === 'success') return;
     const frame = requestAnimationFrame(() => callbacks.current.onStageEnter(stage));
     return () => cancelAnimationFrame(frame);
   }, [stage]);
 
-  // Progress: (0, TOTAL) first, then every change.
   useEffect(() => {
     callbacks.current.onProgress(found.size, TOTAL);
   }, [found]);
 
-  const level = typeof stage === 'number' ? LEVELS[stage] : null;
-  const targets = level ? level.targets[size.shape] : [];
+  const levelIndex = typeof stage === 'number' ? stage : null;
+  const level = levelIndex !== null ? LEVELS[levelIndex] : null;
 
   // Hint: one increase of hintRequest = one hint.
   useEffect(() => {
     if (hintRequest === lastHint.current) return;
     lastHint.current = hintRequest;
-    const next = targets.find((p) => !found.has(p.id));
+    const next = level?.targets.find((id) => !found.has(id));
     if (!next) return;
-    setHintedId(next.id);
+    setHintedId(next);
     later(() => setHintedId(null), 1800);
-  }, [hintRequest, targets, found, later]);
+  }, [hintRequest, level, found, later]);
 
   // Restart: reset the CURRENT level only (stay on the intro if there).
   useEffect(() => {
     if (restartRequest === lastRestart.current) return;
     lastRestart.current = restartRequest;
-    if (!level) return;
-    timers.current.forEach(clearTimeout);
-    timers.current.clear();
-    const ids = new Set(level.targets.wide.map((p) => p.id));
+    if (!level || levelIndex === null) return;
+    clearTimers();
+    const ids = new Set<string>(level.targets);
     setFound((prev) => new Set([...prev].filter((id) => !ids.has(id))));
-    reportedLevels.current.delete(stage as number);
+    reportedLevels.current.delete(levelIndex);
     setHintedId(null);
-    setFinished(false);
-  }, [restartRequest, level, stage]);
+  }, [restartRequest, level, levelIndex]);
+
+  // TUNE (preview only): jump to the screen the panel asks for.
+  useEffect(() => {
+    if (!tuning || tuning.screenRequest === lastScreenRequest.current) return;
+    lastScreenRequest.current = tuning.screenRequest;
+    const screen = tuning.screen;
+    if (!screen) return;
+    clearTimers();
+    if (screen === 'intro') setStage('intro');
+    else if (screen === 'success') setStage('success');
+    else if (screen?.startsWith('level-')) {
+      const index = Number(screen.slice(6)) - 1;
+      // Earlier levels count as found, this level starts fresh.
+      setFound(new Set(LEVELS.slice(0, index).flatMap((l) => [...l.targets])));
+      setStage(index);
+    }
+  }, [tuning]);
 
   const tapStar = (id: string) => {
-    if (!level || found.has(id)) return;
+    if (tuning || !level || levelIndex === null || found.has(id)) return; // in Tune, taps select instead
     const next = new Set(found).add(id);
     setFound(next);
     setHintedId(null);
-    const levelIndex = stage as number;
-    if (!level.targets.wide.every((p) => next.has(p.id))) return;
+    if (!level.targets.every((t) => next.has(t))) return;
 
     if (!reportedLevels.current.has(levelIndex)) {
       reportedLevels.current.add(levelIndex);
       callbacks.current.onLevelComplete(levelIndex);
     }
     if (levelIndex === LEVELS.length - 1) {
-      setFinished(true);
       callbacks.current.onAudioCue?.('game.complete');
       if (!reportedGame.current) {
         reportedGame.current = true;
         callbacks.current.onGameComplete();
       }
+      later(() => setStage('success'), 1200);
       return;
     }
     callbacks.current.onAudioCue?.('level.complete');
     later(() => setStage(levelIndex + 1), 1400);
   };
 
-  const levelDone = !!level && level.targets.wide.every((p) => found.has(p.id));
-
-  const scene: CSSProperties = {
-    ...styles.scene,
-    width: size.width,
-    height: size.height,
-    background: level ? level.background : 'linear-gradient(160deg, #3b1c8c, #6b16ff)',
-  };
+  const levelDone = !!level && level.targets.every((id) => found.has(id));
 
   return (
     <div ref={boxRef} style={styles.box}>
       {size.width > 0 && (
-        <section style={scene} aria-label={stage === 'intro' ? t.introTitle : t.instruction}>
+        <section style={styles.scene} aria-label={stage === 'intro' ? L.text('intro-title') : L.text('instruction')}>
+          <img {...L.box('background', styles.fill)} src={L.src('background')} alt="" draggable={false} />
+
           {stage === 'intro' && (
-            <div style={size.shape === 'tall' ? styles.introCardTall : styles.introCard}>
-              <h2 style={styles.introTitle}>{t.introTitle}</h2>
-              <p style={styles.introBody}>{t.introBody}</p>
+            <div {...L.box('intro-card', styles.introCard)}>
+              <h2 style={styles.introTitle}>{L.text('intro-title')}</h2>
+              <p style={styles.introBody}>{L.text('intro-body')}</p>
               <button
                 type="button"
                 style={styles.startButton}
                 data-intro-start-cue={introStartCue || undefined}
-                onClick={() => setStage(0)}
+                onClick={() => !tuning && setStage(0)}
               >
-                {t.start} →
+                {L.text('start')} →
               </button>
             </div>
           )}
 
           {level && (
             <>
-              {!levelDone && <p style={styles.instruction}>{t.instruction}</p>}
-              {targets.map((p, index) =>
-                found.has(p.id) ? null : (
+              {!levelDone && <p {...L.box('instruction', styles.instruction)}>{L.text('instruction')}</p>}
+              {level.targets.map((id, index) =>
+                found.has(id) ? null : (
                   <button
-                    key={p.id}
+                    key={id}
                     type="button"
-                    aria-label={t.target(index + 1)}
-                    onPointerDown={() => tapStar(p.id)}
-                    style={{
+                    aria-label={LABELS[lang].target(index + 1)}
+                    onPointerDown={() => tapStar(id)}
+                    {...L.box(id, {
                       ...styles.star,
-                      left: `${p.x}%`,
-                      top: `${p.y}%`,
-                      boxShadow: hintedId === p.id ? '0 0 0 6px #ffd84d, 0 0 28px 10px #ffd84d' : undefined,
-                    }}
+                      boxShadow: hintedId === id ? '0 0 0 6px #ffd84d, 0 0 28px 10px #ffd84d' : undefined,
+                    })}
                   >
                     ★
                   </button>
                 ),
               )}
               {levelDone && (
-                <div role="status" style={styles.done}>
-                  {finished ? t.gameComplete : t.levelComplete}
+                <div role="status" {...L.box('done-card', styles.done)}>
+                  {L.text('level-complete')}
                 </div>
               )}
             </>
+          )}
+
+          {stage === 'success' && (
+            <div role="status" {...L.box('done-card', styles.done)}>
+              {L.text('game-complete')}
+            </div>
           )}
         </section>
       )}
@@ -287,25 +255,21 @@ export default function MyGame({
 }
 
 const styles: Record<string, CSSProperties> = {
-  box: {
+  box: { width: '100%', height: '100%', overflow: 'hidden' },
+  scene: {
+    position: 'relative',
     width: '100%',
     height: '100%',
     overflow: 'hidden',
-  },
-  scene: {
-    position: 'relative',
-    overflow: 'hidden',
     borderRadius: 24,
+    background: '#1b1464',
     userSelect: 'none',
     touchAction: 'manipulation',
     fontFamily: FONT,
   },
+  fill: { objectFit: 'cover', pointerEvents: 'none' },
   introCard: {
-    position: 'absolute',
-    top: '6%',
-    right: '4%',
-    bottom: '6%',
-    width: '44%',
+    boxSizing: 'border-box',
     padding: '4%',
     borderRadius: 24,
     border: '4px solid #8a3ffc',
@@ -314,23 +278,7 @@ const styles: Record<string, CSSProperties> = {
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'center',
-    gap: '1em',
-    fontSize: 'clamp(13px, 1.6vw, 20px)',
-  },
-  introCardTall: {
-    position: 'absolute',
-    left: '6%',
-    right: '6%',
-    bottom: '5%',
-    padding: '6%',
-    borderRadius: 24,
-    border: '4px solid #8a3ffc',
-    background: 'rgba(43, 10, 110, 0.86)',
-    color: '#fff',
-    display: 'flex',
-    flexDirection: 'column',
     gap: '0.8em',
-    fontSize: 16,
   },
   introTitle: { margin: 0, color: '#c3ff92', fontSize: '1.7em', fontFamily: FONT },
   introBody: { margin: 0, lineHeight: 1.35 },
@@ -341,46 +289,40 @@ const styles: Record<string, CSSProperties> = {
     background: '#c3ff92',
     color: '#1d0b45',
     fontFamily: FONT, // buttons don't inherit the font by default
-    fontSize: '1.05em',
+    fontSize: '1em',
     fontWeight: 700,
     cursor: 'pointer',
   },
   instruction: {
-    position: 'absolute',
-    left: '50%',
-    bottom: '4%',
-    transform: 'translateX(-50%)',
+    boxSizing: 'border-box',
     margin: 0,
-    padding: '0.5em 1.2em',
+    display: 'grid',
+    placeItems: 'center',
     borderRadius: 999,
     border: '3px solid #fff',
     background: '#2b0a6e',
     color: '#fff',
-    fontSize: 'clamp(14px, 2vw, 22px)',
-    whiteSpace: 'nowrap',
+    textAlign: 'center',
   },
   star: {
-    position: 'absolute',
-    width: 'clamp(48px, 11%, 84px)',
-    aspectRatio: '1',
-    transform: 'translate(-50%, -50%)',
+    minWidth: 44,
+    minHeight: 44,
     border: '3px solid #ffd84d',
     borderRadius: '50%',
     background: 'rgba(255, 255, 255, 0.12)',
     color: '#ffd84d',
-    fontSize: 'clamp(24px, 5vw, 42px)',
     fontFamily: FONT,
     cursor: 'pointer',
+    padding: 0,
   },
   done: {
-    position: 'absolute',
-    inset: 0,
+    boxSizing: 'border-box',
     display: 'grid',
     placeItems: 'center',
     padding: '1em',
+    borderRadius: 24,
     textAlign: 'center',
-    background: 'rgba(255, 255, 255, 0.85)',
+    background: 'rgba(255, 255, 255, 0.9)',
     color: '#6b16ff',
-    fontSize: 'clamp(22px, 4vw, 44px)',
   },
 };

@@ -1,0 +1,253 @@
+{
+  "schema": "ssc-layout-1",
+  "profiles": {
+    "desktop": {
+      "background": {
+        "x": 0,
+        "y": 0,
+        "w": 100,
+        "h": 100,
+        "z": 0,
+        "src": "/game-assets/demo-sky-desktop.webp"
+      },
+      "star-1": {
+        "x": 18.5,
+        "y": 28.8,
+        "w": 7,
+        "h": 12.4,
+        "z": 10,
+        "font": 40
+      },
+      "star-2": {
+        "x": 46.5,
+        "y": 55.8,
+        "w": 7,
+        "h": 12.4,
+        "z": 10,
+        "font": 40
+      },
+      "star-3": {
+        "x": 74.5,
+        "y": 28.8,
+        "w": 7,
+        "h": 12.4,
+        "z": 10,
+        "font": 40
+      },
+      "star-4": {
+        "x": 28.5,
+        "y": 43.8,
+        "w": 7,
+        "h": 12.4,
+        "z": 10,
+        "font": 40
+      },
+      "star-5": {
+        "x": 64.5,
+        "y": 43.8,
+        "w": 7,
+        "h": 12.4,
+        "z": 10,
+        "font": 40
+      },
+      "intro-card": {
+        "x": 52,
+        "y": 8,
+        "w": 44,
+        "h": 84,
+        "z": 5,
+        "font": 21
+      },
+      "instruction": {
+        "x": 30,
+        "y": 85,
+        "w": 40,
+        "h": 10,
+        "z": 6,
+        "font": 24
+      },
+      "done-card": {
+        "x": 20,
+        "y": 30,
+        "w": 60,
+        "h": 40,
+        "z": 20,
+        "font": 44
+      }
+    },
+    "tablet": {
+      "background": {
+        "x": 0,
+        "y": 0,
+        "w": 100,
+        "h": 100,
+        "z": 0,
+        "src": "/game-assets/demo-sky-tablet.webp"
+      },
+      "star-1": {
+        "x": 19.5,
+        "y": 26.0,
+        "w": 9,
+        "h": 12,
+        "z": 10,
+        "font": 48
+      },
+      "star-2": {
+        "x": 45.5,
+        "y": 54.0,
+        "w": 9,
+        "h": 12,
+        "z": 10,
+        "font": 48
+      },
+      "star-3": {
+        "x": 71.5,
+        "y": 26.0,
+        "w": 9,
+        "h": 12,
+        "z": 10,
+        "font": 48
+      },
+      "star-4": {
+        "x": 25.5,
+        "y": 42.0,
+        "w": 9,
+        "h": 12,
+        "z": 10,
+        "font": 48
+      },
+      "star-5": {
+        "x": 65.5,
+        "y": 42.0,
+        "w": 9,
+        "h": 12,
+        "z": 10,
+        "font": 48
+      },
+      "intro-card": {
+        "x": 46,
+        "y": 10,
+        "w": 50,
+        "h": 80,
+        "z": 5,
+        "font": 26
+      },
+      "instruction": {
+        "x": 20,
+        "y": 86,
+        "w": 60,
+        "h": 9,
+        "z": 6,
+        "font": 30
+      },
+      "done-card": {
+        "x": 15,
+        "y": 32,
+        "w": 70,
+        "h": 36,
+        "z": 20,
+        "font": 52
+      }
+    },
+    "phone": {
+      "background": {
+        "x": 0,
+        "y": 0,
+        "w": 100,
+        "h": 100,
+        "z": 0,
+        "src": "/game-assets/demo-sky-phone.webp"
+      },
+      "star-1": {
+        "x": 22.0,
+        "y": 20.5,
+        "w": 16,
+        "h": 9,
+        "z": 10,
+        "font": 80
+      },
+      "star-2": {
+        "x": 62.0,
+        "y": 43.5,
+        "w": 16,
+        "h": 9,
+        "z": 10,
+        "font": 80
+      },
+      "star-3": {
+        "x": 27.0,
+        "y": 67.5,
+        "w": 16,
+        "h": 9,
+        "z": 10,
+        "font": 80
+      },
+      "star-4": {
+        "x": 42.0,
+        "y": 25.5,
+        "w": 16,
+        "h": 9,
+        "z": 10,
+        "font": 80
+      },
+      "star-5": {
+        "x": 42.0,
+        "y": 61.5,
+        "w": 16,
+        "h": 9,
+        "z": 10,
+        "font": 80
+      },
+      "intro-card": {
+        "x": 6,
+        "y": 48,
+        "w": 88,
+        "h": 46,
+        "z": 5,
+        "font": 46
+      },
+      "instruction": {
+        "x": 8,
+        "y": 88,
+        "w": 84,
+        "h": 7,
+        "z": 6,
+        "font": 50
+      },
+      "done-card": {
+        "x": 8,
+        "y": 36,
+        "w": 84,
+        "h": 28,
+        "z": 20,
+        "font": 80
+      }
+    }
+  },
+  "text": {
+    "intro-title": {
+      "en": "The Night Sky",
+      "fr": "Le ciel de nuit"
+    },
+    "intro-body": {
+      "en": "The stars went out! Help Cody light them up again.",
+      "fr": "Les étoiles se sont éteintes ! Aide Cody à les rallumer."
+    },
+    "start": {
+      "en": "Start the mission",
+      "fr": "Commencer la mission"
+    },
+    "instruction": {
+      "en": "Tap every star.",
+      "fr": "Touche toutes les étoiles."
+    },
+    "level-complete": {
+      "en": "Level complete!",
+      "fr": "Niveau terminé !"
+    },
+    "game-complete": {
+      "en": "The sky is bright again!",
+      "fr": "Le ciel brille de nouveau !"
+    }
+  }
+}
