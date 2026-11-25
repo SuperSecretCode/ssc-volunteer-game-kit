@@ -23,7 +23,8 @@ export type VolunteerGameProps = {
   /**
    * The language to show. It can change at any time (the child taps EN/FR).
    * Every piece of child-facing text, including aria-labels, comes from
-   * your TEXT[lang] object. A language change must NOT restart the game,
+   * layout.json (visible text) or your LABELS object (screen-reader-only text).
+   * A language change must NOT restart the game,
    * reset progress, or call onStageEnter again.
    */
   lang: Lang;
@@ -42,6 +43,16 @@ export type VolunteerGameProps = {
    * Games without an intro screen can ignore this.
    */
   introStartCue?: boolean;
+
+  /**
+   * PREVIEW ONLY. Present when "Tune layout" is on in the kit's grey bar.
+   * The real app NEVER passes this. Hand it to makeLayout() from
+   * layoutRuntime.ts and the kit's Tune panel does the rest (dragging,
+   * sizing, text editing). Also: when screenRequest changes, show the screen
+   * named in `screen` (one of the ids in game.config.ts `screens`), so the
+   * panel can jump straight to any screen.
+   */
+  tuning?: TuningState;
 
   /** Call with (0, total) first, then every time the count changes. */
   onProgress: (found: number, total: number) => void;
@@ -69,6 +80,19 @@ export type VolunteerGameProps = {
 
   /** Optional: ask the shell to stop the current recording (for example when leaving a room). */
   onAudioStop?: () => void;
+};
+
+/** PREVIEW ONLY: what the kit's Tune panel passes to the game. */
+export type TuningState = {
+  /** The live draft of layout.json (same shape as LayoutFile in layoutRuntime.ts). */
+  layout: unknown;
+  /** Screen the panel asked for (an id from game.config.ts `screens`), or null. */
+  screen: string | null;
+  /** Goes up by 1 each time the panel asks for a screen, even the same one again. */
+  screenRequest: number;
+  /** Item ids hidden or made see-through in the panel (makeLayout handles these). */
+  hidden: string[];
+  ghosted: string[];
 };
 
 /** One recording in both languages. Use full URLs or paths under /game-assets/. */
@@ -105,4 +129,10 @@ export type GameConfig = {
 
   /** Recordings the game asks for during play with onAudioCue(key). Empty object if none. */
   cueAudio: Record<string, AudioPair>;
+
+  /**
+   * Screens the Tune panel can jump to, in order (intro, each level or phase,
+   * success). The game must show the matching screen when tuning.screenRequest changes.
+   */
+  screens: Array<{ id: string; label: string }>;
 };
